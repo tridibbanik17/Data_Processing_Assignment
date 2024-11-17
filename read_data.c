@@ -1,3 +1,9 @@
+
+/* Author: Tridib Banik, Student Number: 400514461, MacID: banikt       
+ * This C program creates a rectangular array of floats, fills it with values from standard input,
+ * and returns it.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
