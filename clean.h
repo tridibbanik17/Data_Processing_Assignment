@@ -24,3 +24,4 @@ float **clean_delete(float **arrayData, int rows, int cols, int *new_rows);
 void output_data(float **arrayData, int rows, int cols);
 
 
+
