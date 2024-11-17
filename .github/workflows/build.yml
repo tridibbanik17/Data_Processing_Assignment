@@ -11,15 +11,25 @@ jobs:
       # Checkout repository
       - uses: actions/checkout@v4		
 
-      # Build clean.c and run it with redirected input/output
-      - name: build clean			
-        run: gcc -o clean clean.c read_data.c -lm; ./clean <wbcd.txt >cleaned_wbcd.txt;		
-             gcc -o clean clean.c read_data.c -lm; ./clean -d <wbcd.txt >cleaned_wbcd_with_d_flag.txt;
-             gcc -o clean clean.c read_data.c -lm; ./clean a b <wbcd.txt >cleaned_wbcd_with_invalid_args.txt;
+      # Build clean.c 
+      - name: build clean utility
+        run: gcc -o clean clean.c read_data.c -lm
+
+      # Upload the executable as an artifact
+      - name: Upload executable as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: clean-executable
+          path: clean      
+             
+      # Run the Clean utility on wbcd.txt and capture the output
+      - name: Run clean utility
+        run: ./clean -d < wbcd.txt > cleaned_wbcd.txt
+
       # Upload cleaned_wbcd.txt as an artifact
-      - name: upload binary			
+      - name: upload output file as artifact			
         uses: actions/upload-artifact@v4	
         with:
-          name: Cleaned output from the wbcd.txt
-          path: ./cleaned_wbcd.txt			
+          name: wbcd output file
+          path: cleaned_wbcd.txt			
 
