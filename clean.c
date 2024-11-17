@@ -1,3 +1,9 @@
+
+/*Author: Tridib Banik, Student Number: 400514461, MacID: banikt       
+ *This C program is a command line utility named clean that processes a two-dimensional grid of
+  floating-point numbers for machine learning by replacing bad values with legal values.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -71,32 +77,53 @@ float **clean_delete(float **arrayData, int rows, int cols, int *new_rows) {
 }
 
 // Outputs cleaned arrayData
-void output_Data(float **arrayData, int rows, int cols) {
+void output_data(float **arrayData, int rows, int cols) {
+    // Output the number of rows and columns on a single line
     printf("%d %d\n", rows, cols);
     for (int row = 0; row < rows; row++) {
         for (int column = 0; column < cols; column++) {
+            // Output each float rounded to 3 decimal places
             printf("%.3f ", arrayData[row][column]);
         }
+        // After each row is printed, the next row starts from a new line
         printf("\n");
     }
 }
 
+// Output the usage string
+// void usage() {
+//     printf("Usage: clean [-d]\n");
+// }
+
+// main() function takes command line arguments as its parameters
+// main() function calls read_data, clean_impute, clean_delete and output_data.
 int main(int argc, char *argv[]) {
     int rows, cols, new_rows;
-    float **arrayData = read_Data(&rows, &cols);
+    // Call read_data
+    float **arrayData = read_data(&rows, &cols);
 
+    // Check if the program was called with the "-d" argument
     if (argc > 1 && strcmp(argv[1], "-d") == 0) {
-        float **cleaned_Data = clean_delete(arrayData, rows, cols, &new_rows);
-        output_Data(cleaned_data, new_rows, cols);
+        // Call clean_delete to remove rows containing one or more NAN values
+        float **cleaned_data = clean_delete(arrayData, rows, cols, &new_rows);
+        // Call output_data to output the cleaned data to standard output
+        output_data(cleaned_data, new_rows, cols);
+        // Free the memory allocated for the cleaned data
         free(cleaned_data);
     } else {
+        // If no "-d" argument, call clean_impute which replaces NAN values with the column's average
         clean_impute(arrayData, rows, cols);
         output_data(arrayData, rows, cols);
-    }
+    } 
+    //else {
+    //    usage();
+    //}
 
-    for (int i = 0; i < rows; i++) {
-        free(arrayData[i]);
+    // Free the memory allocated for each row in the original data
+    for (int row = 0; row < rows; row++) {
+        free(arrayData[row]);
     }
+    // Free the memory allocated for arrayData
     free(arrayData);
 
     return 0;

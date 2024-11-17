@@ -1,9 +1,4 @@
-clean: clean.c
-	gcc -o clean clean.c
+clean: clean.c read_data.c
+	gcc -o clean clean.c read_data.c -lm
 
-main: main.c 
-	gcc -o main main.c
-
-read_data: read_data.c
-	gcc -o read_data read_data.c
 
