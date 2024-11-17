@@ -22,9 +22,17 @@ jobs:
           name: clean-executable
           path: clean      
              
-      # Run the Clean utility on wbcd.txt and capture the output
+      # Run the Clean utility on wbcd.txt using imputation strategy and capture the output
       - name: Run clean utility
-        run: ./clean -d < wbcd.txt > cleaned_wbcd.txt
+        run: ./clean < wbcd.txt > cleaned_wbcd.txt
+
+      # Run the Clean utility on wbcd.txt with invalid arguments and capture the output
+      - name: Run clean utility
+        run: ./clean -a < wbcd.txt > cleaned_wbcd_with_invalid_args.txt
+
+      # Run the Clean utility on wbcd.txt with -d flag and capture the output
+      - name: Run clean utility
+        run: ./clean -d < wbcd.txt > cleaned_wbcd_with_d_flag.txt
 
       # Upload cleaned_wbcd.txt as an artifact
       - name: upload output file as artifact			
