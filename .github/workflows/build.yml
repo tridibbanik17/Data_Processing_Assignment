@@ -13,7 +13,7 @@ jobs:
 
       # Build clean.c and run it with redirected input/output
       - name: build clean			
-        run: gcc -o clean clean.c; ./clean <wbcd.txt >cleaned_wbcd.txt		
+        run: gcc -o clean clean.c read_data.c -lm; ./clean <wbcd.txt >cleaned_wbcd.txt		
 
       # Upload cleaned_wbcd.txt as an artifact
       - name: upload binary			
