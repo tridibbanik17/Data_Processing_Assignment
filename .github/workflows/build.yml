@@ -13,8 +13,9 @@ jobs:
 
       # Build clean.c and run it with redirected input/output
       - name: build clean			
-        run: gcc -o clean clean.c read_data.c -lm; ./clean <wbcd.txt >cleaned_wbcd.txt		
-
+        run: gcc -o clean clean.c read_data.c -lm; ./clean <wbcd.txt >cleaned_wbcd.txt;		
+             gcc -o clean clean.c read_data.c -lm; ./clean -d <wbcd.txt >cleaned_wbcd_with_d_flag.txt;
+             gcc -o clean clean.c read_data.c -lm; ./clean a b <wbcd.txt >cleaned_wbcd_with_invalid_args.txt;
       # Upload cleaned_wbcd.txt as an artifact
       - name: upload binary			
         uses: actions/upload-artifact@v4	

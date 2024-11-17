@@ -1,13 +1,12 @@
-
-/*Author: Tridib Banik, Student Number: 400514461, MacID: banikt       
- *This C program is a command line utility named clean that processes a two-dimensional grid of
-  floating-point numbers for machine learning by replacing bad values with legal values.
+/* Author: Tridib Banik, Student Number: 400514461, MacID: banikt       
+ * This C program is a command line utility named clean that processes a two-dimensional grid of
+ * floating-point numbers for machine learning by replacing bad values with legal values.
  */
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include <string.h>
+#include <math.h>
 #include "read_data.h"
 #include "clean.h"
 
@@ -19,23 +18,18 @@ void clean_impute(float **arrayData, int rows, int cols) {
 
         // Calculate column average
         for (int row = 0; row < rows; row++) {
-            if (isnan(arrayData[row][column]) == 0) {
+            if (!isnan(arrayData[row][column])) {
                 sum += arrayData[row][column];
                 count++;
             }
         }
 
-        float average;
-        if (count > 0) {
-            average = sum / count;
-        }
-        else {
-            average = 0.0;
-        }
+        // Compute the average or use the default value
+        float average = (count > 0) ? (sum / count) : DEFAULT_VALUE;
 
-        // Replace NAN with average
+        // Replace NAN values with the average
         for (int row = 0; row < rows; row++) {
-            if (isnan(arrayData[row][column]) != 0) {
+            if (isnan(arrayData[row][column])) {
                 arrayData[row][column] = average;
             }
         }
@@ -44,87 +38,79 @@ void clean_impute(float **arrayData, int rows, int cols) {
 
 // Removes rows containing NAN values
 float **clean_delete(float **arrayData, int rows, int cols, int *new_rows) {
-    // Allocate memory for the filtered data array, initially the same size as the original array
+    // Allocate memory for the filtered data array
     float **filtered_data = (float **)malloc(rows * sizeof(float *));
-    // Initialize the count of new rows to 0
     *new_rows = 0;
 
-    // Iterate over each row in the original array
+    // Iterate over each row
     for (int row = 0; row < rows; row++) {
-        // Initialize has_nan
         int has_nan = 0;
 
-        // Iterate over each column in the current row
+        // Check if the current row contains a NAN value
         for (int column = 0; column < cols; column++) {
-            // Check if the current element is NAN
-            if (isnan(arrayData[row][column]) != 0) {
-                // NAN is found, so has_nan = 1
+            if (isnan(arrayData[row][column])) {
                 has_nan = 1;
                 break;
             }
         }
 
-        // If the current row does not contain any NAN values
-        if (has_nan == 0) {
+        // If no NAN values, keep the row
+        if (!has_nan) {
             filtered_data[*new_rows] = arrayData[row];
             (*new_rows)++;
         }
     }
 
-    // Reallocate memory for the filtered data array to match the number of valid rows
-    filtered_data = (float **)realloc(filtered_data, *new_rows * sizeof(float *));
+    // Reallocate memory to match the number of valid rows
+    filtered_data = (float **)realloc(filtered_data, (*new_rows) * sizeof(float *));
     return filtered_data;
 }
 
-// Outputs cleaned arrayData
+// Outputs the cleaned data
 void output_data(float **arrayData, int rows, int cols) {
-    // Output the number of rows and columns on a single line
-    printf("%d %d\n", rows, cols);
+    printf("%d %d\n", rows, cols);  // Output the number of rows and columns
     for (int row = 0; row < rows; row++) {
         for (int column = 0; column < cols; column++) {
-            // Output each float rounded to 3 decimal places
-            printf("%.3f ", arrayData[row][column]);
+            printf(OUTPUT_PRECISION " ", arrayData[row][column]);  // Output values with precision
         }
-        // After each row is printed, the next row starts from a new line
-        printf("\n");
+        printf("\n");  // New line for each row
     }
 }
 
-// Output the usage string
-// void usage() {
-//     printf("Usage: clean [-d]\n");
-// }
-
-// main() function takes command line arguments as its parameters
-// main() function calls read_data, clean_impute, clean_delete and output_data.
+// Main function
 int main(int argc, char *argv[]) {
     int rows, cols, new_rows;
-    // Call read_data
+
+    // Read data from standard input
     float **arrayData = read_data(&rows, &cols);
 
+    if (!arrayData) {
+        fprintf(stderr, "Error: Unable to allocate memory for input data.\n");
+        return EXIT_FAILURE;
+    }
+
     // Check if the program was called with the "-d" argument
-    if (argc > 1 && strcmp(argv[1], "-d") == 0) {
+    if (argc == 2 && strcmp(argv[1], DELETE_MODE) == 0) {
         // Call clean_delete to remove rows containing one or more NAN values
         float **cleaned_data = clean_delete(arrayData, rows, cols, &new_rows);
-        // Call output_data to output the cleaned data to standard output
-        output_data(cleaned_data, new_rows, cols);
-        // Free the memory allocated for the cleaned data
-        free(cleaned_data);
-    } else {
-        // If no "-d" argument, call clean_impute which replaces NAN values with the column's average
+        if (cleaned_data) {
+            output_data(cleaned_data, new_rows, cols);  // Output the cleaned data
+            free(cleaned_data);  // Free memory for cleaned data
+        }
+    } else if (argc == 1) {
+        // Call clean_impute to replace NAN values with column averages
         clean_impute(arrayData, rows, cols);
-        output_data(arrayData, rows, cols);
-    } 
-    //else {
-    //    usage();
-    //}
+        output_data(arrayData, rows, cols);  // Output the cleaned data
+    } else {
+        // If invalid arguments, print usage message
+        printf(USAGE_MESSAGE);
+    }
 
-    // Free the memory allocated for each row in the original data
+    // Free memory for the original data
     for (int row = 0; row < rows; row++) {
         free(arrayData[row]);
     }
-    // Free the memory allocated for arrayData
     free(arrayData);
 
-    return 0;
+    return EXIT_SUCCESS;
 }
